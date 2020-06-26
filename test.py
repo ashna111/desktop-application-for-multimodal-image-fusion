@@ -8,7 +8,7 @@ root=Tk()
 root.title('Multi-modal medical image fusion to detect brain tumors')
 # root.geometry('900x500')
 
-ct=cv2.imread(r'C:\Users\Kushal\Desktop\ct.jpg')
+ct=cv2.imread(r'C:\Users\rebec\Desktop\BE_Project\multimodal-image-fusion-to-detect-brain-tumors\dataset\Patient Data\p1\ct.jpg')
 ct = cv2.cvtColor(ct, cv2.COLOR_BGR2GRAY)
 
 ct_registered_image = Image.fromarray(ct)

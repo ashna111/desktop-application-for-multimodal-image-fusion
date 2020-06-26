@@ -20,15 +20,10 @@ import pywt.data
 from skimage.morphology import extrema
 from skimage.morphology import watershed as skwater
 
-global my_label_1,my_label_2,ct_x_label,ct_y_label,mri_x_label,mri_y_label,ct
+# Points for registration
+mri_points=[]
+ct_points=[]
 
-# Root window
-root=Tk()
-root.title('Multi-modal medical image fusion to detect brain tumors')
-# root.geometry('900x500')
-scroll_bar = Scrollbar(root) 
-
-# Helper functions
 def procrustes(X, Y, scaling=True, reflection='best'):
     n,m = X.shape
     ny,my = Y.shape
@@ -99,7 +94,6 @@ def procrustes(X, Y, scaling=True, reflection='best'):
 
     return d, Z, tform
 
-# Registration
 def register():
     frame_file.destroy()
     canvas_mri.destroy()
@@ -111,53 +105,30 @@ def register():
     # mri_y_label.destroy()
     # ct_x_label.destroy()
     # ct_y_label.destroy()
-    
 
     mri_registered_label=Label(root,text="MRI Rregistered Image").grid(row=0,column=0)
     ct_registered_label=Label(root,text="CT Image").grid(row=0,column=1)
 
-    # ct_registered_image = Image.fromarray(ct)
-    # ct_registered_image_1 = ImageTk.PhotoImage(image=ct_registered_image) 
-    
-    ct_registered_image_1 = ct_image
-    ct_2=ct_registered_image_1
-    ct_registered_image_label=Label(image=ct_registered_image_1)
+    ct=cv2.imread(r'C:\Users\rebec\Desktop\ct.jpg')
+    ct = cv2.cvtColor(ct, cv2.COLOR_BGR2GRAY)
+
+    ct_registered_image = Image.fromarray(ct)
+    ct_registered_image = ImageTk.PhotoImage(image=ct_registered_image) 
+
+    ct_registered_image_label=Label(image=ct_registered_image)
     ct_registered_image_label.grid(row=1,column=1)
 
-    ct_registered_image_label.image=ct_registered_image_1
-    # global mri_registered
+    ct_registered_image_label.image=ct_registered_image
 
-    # X_pts = np.asarray(ct_points)
-    # Y_pts = np.asarray(mri_points)
-    # d,Z_pts,Tform = procrustes(X_pts,Y_pts)
-    # R = np.eye(3)
-    # R[0:2,0:2] = Tform['rotation']
+    # canvas_ct = Canvas(root,width=512, height=512)
+    # canvas_ct.grid(row=2,column=1)
 
-    # S = np.eye(3) * Tform['scale'] 
-    # S[2,2] = 1
-    # t = np.eye(3)
-    # t[0:2,2] = Tform['translation']
-    # M = np.dot(np.dot(R,S),t.T).T
-    # h=ct.shape[0]
-    # w=ct.shape[1]
-    # tr_Y_img = cv2.warpAffine(mri,M[0:2,:],(h,w))
-    # mri_registered=ImageTk.PhotoImage(tr_Y_img).grid(row=6,column=0)
+    # canvas_ct.create_image(0, 0, image=ct_registered_image, anchor="nw")
+    # canvas_ct.config(scrollregion=canvas_ct.bbox(ALL))
 
+    
 
-# Upload Files frame
-frame_file=LabelFrame(root, text="Select files:",pady=20)
-frame_file.grid(row=0,column=0)
-
-# Display Uploaded Images
-canvas_mri = Canvas(root,width=512, height=512)
-canvas_mri.grid(row=2,column=0)
-
-canvas_ct = Canvas(root,width=512, height=512)
-canvas_ct.grid(row=2,column=1)
-
-# Points for registration
-mri_points=[]
-ct_points=[]
+    # print(ct_registered_image_label.winfo_exists())
 
 def openMRI():
     global my_image_1,mri_image,my_label_1
@@ -183,6 +154,7 @@ def openMRI():
 
         mri_x_label.after(3000, mri_x_label.destroy)
         mri_y_label.after(3000, mri_y_label.destroy)
+
     #mouseclick event
     canvas_mri.bind("<Button 1>",printcoordsMRI)
 
@@ -192,8 +164,8 @@ def openCT():
     root.filename=filedialog.askopenfilename(initialdir="/", title="Select CT Image")
     my_label_2=Label(root,text="CT Image")
     my_label_2.grid(row=1,column=1)
-    # ct=cv2.imread(r'C:\Users\rebec\Desktop\ct.jpg')
-    # ct = cv2.cvtColor(ct, cv2.COLOR_BGR2GRAY)
+    ct=cv2.imread(r'C:\Users\rebec\Desktop\ct.jpg')
+    ct = cv2.cvtColor(ct, cv2.COLOR_BGR2GRAY)
     my_image_2=ImageTk.PhotoImage(Image.open(root.filename))
     ct_image=my_image_2
 
@@ -219,12 +191,30 @@ def openCT():
     #mouseclick event
     canvas_ct.bind("<Button 1>",printcoordsCT)
 
+
+# Root window
+root=Tk()
+root.title('Multi-modal medical image fusion to detect brain tumors')
+# root.geometry('900x500')
+scroll_bar = Scrollbar(root) 
+
+#  Upload Files frame
+frame_file=LabelFrame(root, text="Select files:",pady=20)
+frame_file.grid(row=0,column=0)
+
+# Display Uploaded Images
+canvas_mri = Canvas(root,width=512, height=512)
+canvas_mri.grid(row=2,column=0)
+
+canvas_ct = Canvas(root,width=512, height=512)
+canvas_ct.grid(row=2,column=1)
+
+
 mri_button=Button(frame_file,text="Select MRI File",command=openMRI)
 mri_button.grid(row=0,column=0,pady=10,padx=10)
 
 ct_button=Button(frame_file,text="Select CT File",command=openCT)
 ct_button.grid(row=0,column=1,pady=10,padx=10)
-
 
 
 
