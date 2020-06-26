@@ -125,23 +125,32 @@ def register():
     ct_registered_image_label.grid(row=1,column=1)
 
     ct_registered_image_label.image=ct_registered_image_1
-    # global mri_registered
+    
+    global mri_registered
 
-    # X_pts = np.asarray(ct_points)
-    # Y_pts = np.asarray(mri_points)
-    # d,Z_pts,Tform = procrustes(X_pts,Y_pts)
-    # R = np.eye(3)
-    # R[0:2,0:2] = Tform['rotation']
+    X_pts = np.asarray(ct_points)
+    Y_pts = np.asarray(mri_points)
+    d,Z_pts,Tform = procrustes(X_pts,Y_pts)
+    R = np.eye(3)
+    R[0:2,0:2] = Tform['rotation']
 
-    # S = np.eye(3) * Tform['scale'] 
-    # S[2,2] = 1
-    # t = np.eye(3)
-    # t[0:2,2] = Tform['translation']
-    # M = np.dot(np.dot(R,S),t.T).T
-    # h=ct.shape[0]
-    # w=ct.shape[1]
-    # tr_Y_img = cv2.warpAffine(mri,M[0:2,:],(h,w))
-    # mri_registered=ImageTk.PhotoImage(tr_Y_img).grid(row=6,column=0)
+    S = np.eye(3) * Tform['scale'] 
+    S[2,2] = 1
+    t = np.eye(3)
+    t[0:2,2] = Tform['translation']
+    M = np.dot(np.dot(R,S),t.T).T
+    h=ct.shape[0]
+    w=ct.shape[1]
+    tr_Y_img = cv2.warpAffine(mri,M[0:2,:],(h,w))
+
+
+
+    mri_registered_image = Image.fromarray(tr_Y_img)
+    mri_registered=ImageTk.PhotoImage(image=mri_registered_image)
+    mri_registered_image_label=Label(image=mri_registered_image)
+    mri_registered_image_label.grid(row=1,column=0)
+
+
 
 
 # Upload Files frame
@@ -160,7 +169,10 @@ mri_points=[]
 ct_points=[]
 
 def openMRI():
-    global my_image_1,mri_image,my_label_1
+    global my_image_1,mri_image,my_label_1, mri
+
+    mri = cv2.imread(r'C:\Users\Hp pc\Desktop\mri.jpg')
+    mri = cv2.cvtColor(mri, cv2.COLOR_BGR2GRAY)
 
     root.filename=filedialog.askopenfilename(initialdir="/", title="Select MRI Image")
     my_label_1=Label(root,text="MRI Image")
@@ -192,8 +204,8 @@ def openCT():
     root.filename=filedialog.askopenfilename(initialdir="/", title="Select CT Image")
     my_label_2=Label(root,text="CT Image")
     my_label_2.grid(row=1,column=1)
-    # ct=cv2.imread(r'C:\Users\rebec\Desktop\ct.jpg')
-    # ct = cv2.cvtColor(ct, cv2.COLOR_BGR2GRAY)
+    ct=cv2.imread(r'C:\Users\Hp pc\Desktop\ct.jpg')
+    ct = cv2.cvtColor(ct, cv2.COLOR_BGR2GRAY)
     my_image_2=ImageTk.PhotoImage(Image.open(root.filename))
     ct_image=my_image_2
 
