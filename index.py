@@ -139,9 +139,9 @@ def register():
     t = np.eye(3)
     t[0:2,2] = Tform['translation']
     M = np.dot(np.dot(R,S),t.T).T
-    h=ct.shape[0]
-    w=ct.shape[1]
-    tr_Y_img = cv2.warpAffine(mri,M[0:2,:],(h,w))
+    h=ct_cv.shape[0]
+    w=ct_cv.shape[1]
+    tr_Y_img = cv2.warpAffine(mri_cv,M[0:2,:],(h,w))
 
 
     mri_registered_image = Image.fromarray(tr_Y_img)
@@ -166,15 +166,16 @@ mri_points=[]
 ct_points=[]
 
 def openMRI():
-    global my_image_1,mri_image,my_label_1, mri
+    global my_image_1,mri_image,my_label_1, mri_cv
 
-    mri = cv2.imread(r'C:\Users\Hp pc\Desktop\mri.jpg')
-    mri = cv2.cvtColor(mri, cv2.COLOR_BGR2GRAY)
+    path=filedialog.askopenfilename(title="Select MRI Image")
 
-    root.filename=filedialog.askopenfilename(initialdir="/", title="Select MRI Image")
+    mri_cv = cv2.imread(path)
+    mri_cv = cv2.cvtColor(mri_cv, cv2.COLOR_BGR2GRAY)
+
     my_label_1=Label(root,text="MRI Image")
     my_label_1.grid(row=1,column=0)
-    my_image_1=ImageTk.PhotoImage(Image.open(root.filename))
+    my_image_1=ImageTk.PhotoImage(Image.open(path))
     mri_image=my_image_1
 
     canvas_mri.create_image(0, 0, image=my_image_1, anchor="nw")
@@ -196,14 +197,16 @@ def openMRI():
     canvas_mri.bind("<Button 1>",printcoordsMRI)
 
 def openCT():
-    global my_image_2,ct_image,registration_button,my_label_2,ct
+    global my_image_2,ct_image,registration_button,my_label_2,ct_cv
 
-    root.filename = filedialog.askopenfilename(initialdir="/", title="Select CT Image")
+    path=filedialog.askopenfilename(title="Select CT Image")
+
+    ct_cv = cv2.imread(path)
+    ct_cv = cv2.cvtColor(ct_cv, cv2.COLOR_BGR2GRAY)
+
     my_label_2 = Label(root,text="CT Image")
     my_label_2.grid(row=1,column=1)
-    ct = cv2.imread(r'C:\Users\Hp pc\Desktop\ct.jpg')
-    ct = cv2.cvtColor(ct, cv2.COLOR_BGR2GRAY)
-    my_image_2=ImageTk.PhotoImage(Image.open(root.filename))
+    my_image_2=ImageTk.PhotoImage(Image.open(path))
     ct_image=my_image_2
 
     canvas_ct.create_image(0, 0, image=my_image_2, anchor="nw")
