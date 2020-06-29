@@ -113,8 +113,8 @@ def register():
     # ct_y_label.destroy()
     
 
-    mri_registered_label=Label(root,text="MRI Rregistered Image").grid(row=0,column=0)
-    ct_registered_label=Label(root,text="CT Image").grid(row=0,column=1)
+    mri_registered_label=Label(root,text="MRI Registered Image").grid(row=0,column=0)
+    ct_registered_label=Label(root,text="CT Registered Image").grid(row=0,column=1)
 
     # ct_registered_image = Image.fromarray(ct)
     # ct_registered_image_1 = ImageTk.PhotoImage(image=ct_registered_image) 
@@ -144,13 +144,10 @@ def register():
     tr_Y_img = cv2.warpAffine(mri,M[0:2,:],(h,w))
 
 
-
     mri_registered_image = Image.fromarray(tr_Y_img)
-    mri_registered=ImageTk.PhotoImage(image=mri_registered_image)
-    mri_registered_image_label=Label(image=mri_registered_image)
+    mri_registered = ImageTk.PhotoImage(image=mri_registered_image)
+    mri_registered_image_label = Label(image=mri_registered)
     mri_registered_image_label.grid(row=1,column=0)
-
-
 
 
 # Upload Files frame
@@ -201,10 +198,10 @@ def openMRI():
 def openCT():
     global my_image_2,ct_image,registration_button,my_label_2,ct
 
-    root.filename=filedialog.askopenfilename(initialdir="/", title="Select CT Image")
-    my_label_2=Label(root,text="CT Image")
+    root.filename = filedialog.askopenfilename(initialdir="/", title="Select CT Image")
+    my_label_2 = Label(root,text="CT Image")
     my_label_2.grid(row=1,column=1)
-    ct=cv2.imread(r'C:\Users\Hp pc\Desktop\ct.jpg')
+    ct = cv2.imread(r'C:\Users\Hp pc\Desktop\ct.jpg')
     ct = cv2.cvtColor(ct, cv2.COLOR_BGR2GRAY)
     my_image_2=ImageTk.PhotoImage(Image.open(root.filename))
     ct_image=my_image_2
@@ -213,7 +210,7 @@ def openCT():
     canvas_ct.config(scrollregion=canvas_ct.bbox(ALL))
 
     # submit registration points button
-    registration_button=Button(root,text="Submit Points",command=register)
+    registration_button = Button(root,text="Submit Points",command=register)
     registration_button.grid(row=5,column=0)
 
     def printcoordsCT(event):
@@ -236,9 +233,6 @@ mri_button.grid(row=0,column=0,pady=10,padx=10)
 
 ct_button=Button(frame_file,text="Select CT File",command=openCT)
 ct_button.grid(row=0,column=1,pady=10,padx=10)
-
-
-
 
 
 
