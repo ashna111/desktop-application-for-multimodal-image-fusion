@@ -99,58 +99,6 @@ def procrustes(X, Y, scaling=True, reflection='best'):
 
     return d, Z, tform
 
-# Registration
-def register():
-    frame_file.destroy()
-    canvas_mri.destroy()
-    canvas_ct.destroy()
-    registration_button.destroy()
-    my_label_1.destroy()
-    my_label_2.destroy()
-    # mri_x_label.destroy()
-    # mri_y_label.destroy()
-    # ct_x_label.destroy()
-    # ct_y_label.destroy()
-    
-    global mri_registered
-
-    X_pts = np.asarray(ct_points)
-    Y_pts = np.asarray(mri_points)
-    d,Z_pts,Tform = procrustes(X_pts,Y_pts)
-    R = np.eye(3)
-    R[0:2,0:2] = Tform['rotation']
-
-    S = np.eye(3) * Tform['scale'] 
-    S[2,2] = 1
-    t = np.eye(3)
-    t[0:2,2] = Tform['translation']
-    M = np.dot(np.dot(R,S),t.T).T
-    h=ct_cv.shape[0]
-    w=ct_cv.shape[1]
-    tr_Y_img = cv2.warpAffine(mri_cv,M[0:2,:],(h,w))
-
-
-    mri_registered_image = Image.fromarray(tr_Y_img)
-    mri_registered = ImageTk.PhotoImage(image=mri_registered_image)
-    mri_registered_image_label = Label(image=mri_registered)
-    mri_registered_image_label.grid(row=1,column=0)
-
-
-    mri_registered_label=Label(root,text="MRI Registered Image").grid(row=0,column=0)
-    ct_registered_label=Label(root,text="CT Registered Image").grid(row=0,column=1)
-
-    # ct_registered_image = Image.fromarray(ct)
-    # ct_registered_image_1 = ImageTk.PhotoImage(image=ct_registered_image) 
-    
-    ct_registered_image_1 = ct_image
-    ct_2=ct_registered_image_1
-    ct_registered_image_label=Label(image=ct_registered_image_1)
-    ct_registered_image_label.grid(row=1,column=1)
-
-    ct_registered_image_label.image=ct_registered_image_1
-
-    # fusion_button = Button(root,text="Perform Fusion",command=fuse_image)
-
 # VGG19 CNN For Fusion
 class VGG19(torch.nn.Module):
     def __init__(self, device='cpu'):
@@ -295,6 +243,72 @@ class Fusion:
                 self.images_to_tensors.append(torch.from_numpy(np_input).cuda())
             else:
                 self.images_to_tensors.append(torch.from_numpy(np_input))
+
+def fuse_image():
+    mri_registered_image_label.destroy()
+    ct_registered_image_label.destroy()
+    fusion_button.destroy()
+    mri_registered_label.destroy()
+    ct_registered_label.destroy()
+    # fusion_button.destroy()
+
+
+
+# Registration
+def register():
+    frame_file.destroy()
+    canvas_mri.destroy()
+    canvas_ct.destroy()
+    registration_button.destroy()
+    my_label_1.destroy()
+    my_label_2.destroy()
+    # mri_x_label.destroy()
+    # mri_y_label.destroy()
+    # ct_x_label.destroy()
+    # ct_y_label.destroy()
+    
+    global mri_registered, mri_registered_cv, mri_registered_label, mri_registered_image_label, ct_registered_label, ct_registered_image_label, fusion_button
+
+    X_pts = np.asarray(ct_points)
+    Y_pts = np.asarray(mri_points)
+    d,Z_pts,Tform = procrustes(X_pts,Y_pts)
+    R = np.eye(3)
+    R[0:2,0:2] = Tform['rotation']
+
+    S = np.eye(3) * Tform['scale'] 
+    S[2,2] = 1
+    t = np.eye(3)
+    t[0:2,2] = Tform['translation']
+    M = np.dot(np.dot(R,S),t.T).T
+    h=ct_cv.shape[0]
+    w=ct_cv.shape[1]
+    mri_registered_cv = cv2.warpAffine(mri_cv,M[0:2,:],(h,w))
+
+
+    mri_registered_image = Image.fromarray(mri_registered_cv)
+    mri_registered = ImageTk.PhotoImage(image=mri_registered_image)
+    mri_registered_image_label = Label(image=mri_registered)
+    mri_registered_image_label.grid(row=1,column=0)
+
+    
+
+    mri_registered_label=Label(root,text="MRI Registered Image")
+    mri_registered_label.grid(row=0,column=0)
+    ct_registered_label=Label(root,text="CT Registered Image")
+    ct_registered_label.grid(row=0,column=1)
+
+    # ct_registered_image = Image.fromarray(ct)
+    # ct_registered_image_1 = ImageTk.PhotoImage(image=ct_registered_image) 
+    
+    ct_registered_image_1 = ct_image
+    ct_2=ct_registered_image_1
+    ct_registered_image_label=Label(image=ct_registered_image_1)
+    ct_registered_image_label.grid(row=1,column=1)
+
+    ct_registered_image_label.image=ct_registered_image_1
+
+    fusion_button = Button(root,text="Perform Fusion",command=fuse_image)
+    fusion_button.grid(row=2, column=0)
 
 
 # Upload Files frame
