@@ -20,7 +20,7 @@ import pywt.data
 from skimage.morphology import extrema
 from skimage.morphology import watershed as skwater
 
-global my_label_1,my_label_2,ct_x_label,ct_y_label,mri_x_label,mri_y_label,ct, mri_registered, mri_registered_cv, mri_registered_label, mri_registered_image_label, ct_registered_label, ct_registered_image_label, fusion_button
+global my_label_1,my_label_2,ct_x_label,ct_y_label,mri_x_label,mri_y_label,ct, mri_registered, mri_registered_cv, mri_registered_label, mri_registered_image_label, ct_registered_label, ct_registered_image_label, fusion_button, fusion_img_display_label, fused_image_label
 
 # Root window
 root=Tk()
@@ -244,12 +244,73 @@ class Fusion:
             else:
                 self.images_to_tensors.append(torch.from_numpy(np_input))
 
+#Segmentation
+def segment_image():
+    segmentation_button.destroy()
+    fused_image_label.destroy()
+    fusion_img_display_label.destroy()
+    
+    img = cv2.imread("fusion.jpg")
+    gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+    ret, thresh = cv2.threshold(gray,0,255,cv2.THRESH_OTSU)
+
+    ret, markers = cv2.connectedComponents(thresh)
+
+    marker_area = [np.sum(markers==m) for m in range(np.max(markers)) if m!=0] 
+    largest_component = np.argmax(marker_area)+1 #Add 1 since we dropped zero above                        
+    brain_mask = markers==largest_component
+
+    brain_out = img.copy()
+    brain_out[brain_mask==False] = (0,0,0)
+
+    img = cv2.imread("fusion.jpg")
+    gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+    ret, thresh = cv2.threshold(gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+
+    # noise removal
+    kernel = np.ones((3,3),np.uint8)
+    opening = cv2.morphologyEx(thresh,cv2.MORPH_OPEN,kernel, iterations = 2)
+
+    # sure background area
+    sure_bg = cv2.dilate(opening,kernel,iterations=3)
+
+    # Finding sure foreground area
+    dist_transform = cv2.distanceTransform(opening,cv2.DIST_L2,5)
+    ret, sure_fg = cv2.threshold(dist_transform,0.7*dist_transform.max(),255,0)
+
+    # Finding unknown region
+    sure_fg = np.uint8(sure_fg)
+    unknown = cv2.subtract(sure_bg,sure_fg)
+
+    # Marker labelling
+    ret, markers = cv2.connectedComponents(sure_fg)
+
+    # Add one to all labels so that sure background is not 0, but 1
+    markers = markers+1
+
+    # Now, mark the region of unknown with zero
+    markers[unknown==255] = 0
+    markers = cv2.watershed(img,markers)
+    img[markers == -1] = [255,0,0]
+
+    im1 = cv2.cvtColor(img,cv2.COLOR_HSV2RGB)
+    cv2.imwrite("segmented.jpg", im1)
+
+    segmented_image_display = Image.fromarray(im1)
+    segmented_image_1 = ImageTk.PhotoImage(image=segmented_image_display)
+    segmented_image_display_label = Label(image=segmented_image_1)
+    segmented_image_display_label.grid(row=1,column=0)
+
+    segmented_image_display_label.image = segmented_image_1
+
 def fuse_image():
     mri_registered_image_label.destroy()
     ct_registered_image_label.destroy()
     fusion_button.destroy()
     mri_registered_label.destroy()
     ct_registered_label.destroy()
+
+    global fused_image_label, fusion_img_display_label, segmentation_button
 
     # Wavelet transform of image, and plot approximation and details
     coeffs1 = pywt.dwt2(mri_registered_cv, 'haar')
@@ -330,6 +391,9 @@ def fuse_image():
     fusion_img_display_label.grid(row=1,column=0)
 
     fusion_img_display_label.image = fusion_img_1
+
+    segmentation_button = Button(root,text="Perform Segmentation",command=segment_image)
+    segmentation_button.grid(row=2, column=0)
 
 
 # Registration
