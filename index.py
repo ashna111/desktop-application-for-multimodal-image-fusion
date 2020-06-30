@@ -27,7 +27,6 @@ root=Tk()
 root.title('Multi-modal medical image fusion to detect brain tumors')
 # root.geometry('900x500')
 scroll_bar = Scrollbar(root) 
-# scroll_bar.pack(side=RIGHT, fill=Y)
 
 # Helper functions
 def procrustes(X, Y, scaling=True, reflection='best'):
@@ -251,7 +250,7 @@ def segment_image():
     fused_image_label.destroy()
     fusion_img_display_label.destroy()
     
-    img = cv2.imread("fusion.jpg")
+    img = cv2.imread("static/fusion.jpg")
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     ret, thresh = cv2.threshold(gray,0,255,cv2.THRESH_OTSU)
 
@@ -264,7 +263,7 @@ def segment_image():
     brain_out = img.copy()
     brain_out[brain_mask==False] = (0,0,0)
 
-    img = cv2.imread("fusion.jpg")
+    img = cv2.imread("static/fusion.jpg")
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     ret, thresh = cv2.threshold(gray,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
 
@@ -295,7 +294,7 @@ def segment_image():
     img[markers == -1] = [255,0,0]
 
     im1 = cv2.cvtColor(img,cv2.COLOR_HSV2RGB)
-    cv2.imwrite("segmented.jpg", im1)
+    cv2.imwrite("static/segmented.jpg", im1)
 
     seg_label = Label(root,text="Segmented Image")
     seg_label.grid(row=0,column=0)
@@ -321,7 +320,7 @@ def fuse_image():
     LL_mri, (LH_mri, HL_mri, HH_mri) = coeffs1
 
     for i, a in enumerate([LL_mri, LH_mri, HL_mri, HH_mri]):
-        path='mri_'+str(i)+'.jpg'
+        path='static/mri_'+str(i)+'.jpg'
         cv2.imwrite(path,a)
 
     # Wavelet transform of image, and plot approximation and details
@@ -329,62 +328,62 @@ def fuse_image():
     LL_ct, (LH_ct, HL_ct, HH_ct) = coeffs2
 
     for i, a in enumerate([LL_ct, LH_ct, HL_ct, HH_ct]):
-        path='ct_'+str(i)+'.jpg'
+        path='static/ct_'+str(i)+'.jpg'
         cv2.imwrite(path,a)
 
     #Performing fusion
     input_images=[]
-    mri = cv2.imread('mri_0.jpg')
+    mri = cv2.imread('static/mri_0.jpg')
     mri = cv2.cvtColor(mri, cv2.COLOR_BGR2GRAY)
 
-    ct = cv2.imread('ct_0.jpg')
+    ct = cv2.imread('static/ct_0.jpg')
     ct = cv2.cvtColor(ct, cv2.COLOR_BGR2GRAY)
     input_images.append(mri)
     input_images.append(ct)
     FU = Fusion(input_images)
     fusion_1 = FU.fuse()
-    cv2.imwrite('fusion_1.jpg', fusion_1)
+    cv2.imwrite('static/fusion_1.jpg', fusion_1)
 
     input_images=[]
-    mri = cv2.imread('mri_1.jpg')
+    mri = cv2.imread('static/mri_1.jpg')
     mri = cv2.cvtColor(mri, cv2.COLOR_BGR2GRAY)
 
-    ct = cv2.imread('ct_1.jpg')
+    ct = cv2.imread('static/ct_1.jpg')
     ct = cv2.cvtColor(ct, cv2.COLOR_BGR2GRAY)
     input_images.append(mri)
     input_images.append(ct)
     FU = Fusion(input_images)
     fusion_2 = FU.fuse()
-    cv2.imwrite('fusion_2.jpg', fusion_2)
+    cv2.imwrite('static/fusion_2.jpg', fusion_2)
 
     input_images=[]
-    mri = cv2.imread('mri_2.jpg')
+    mri = cv2.imread('static/mri_2.jpg')
     mri = cv2.cvtColor(mri, cv2.COLOR_BGR2GRAY)
 
-    ct = cv2.imread('ct_2.jpg')
+    ct = cv2.imread('static/ct_2.jpg')
     ct = cv2.cvtColor(ct, cv2.COLOR_BGR2GRAY)
     input_images.append(mri)
     input_images.append(ct)
     FU = Fusion(input_images)
     fusion_3 = FU.fuse()
-    cv2.imwrite('fusion_3.jpg', fusion_3)
+    cv2.imwrite('static/fusion_3.jpg', fusion_3)
 
     input_images=[]
-    mri = cv2.imread('mri_3.jpg')
+    mri = cv2.imread('static/mri_3.jpg')
     mri = cv2.cvtColor(mri, cv2.COLOR_BGR2GRAY)
 
-    ct = cv2.imread('ct_3.jpg')
+    ct = cv2.imread('static/ct_3.jpg')
     ct = cv2.cvtColor(ct, cv2.COLOR_BGR2GRAY)
     input_images.append(mri)
     input_images.append(ct)
     FU = Fusion(input_images)
     fusion_4 = FU.fuse()
-    cv2.imwrite('fusion_4.jpg', fusion_4)
+    cv2.imwrite('static/fusion_4.jpg', fusion_4)
 
     coeffs=(fusion_1,(fusion_2,fusion_3,fusion_4))
     fusion=pywt.idwt2(coeffs,'haar')
 
-    cv2.imwrite('fusion.jpg',fusion)
+    cv2.imwrite('static/fusion.jpg',fusion)
 
     fused_image_label=Label(root,text="Fused Image")
     fused_image_label.grid(row=0,column=0)
