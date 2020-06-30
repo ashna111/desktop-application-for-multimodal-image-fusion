@@ -27,6 +27,7 @@ root=Tk()
 root.title('Multi-modal medical image fusion to detect brain tumors')
 # root.geometry('900x500')
 scroll_bar = Scrollbar(root) 
+# scroll_bar.pack(side=RIGHT, fill=Y)
 
 # Helper functions
 def procrustes(X, Y, scaling=True, reflection='best'):
@@ -295,6 +296,9 @@ def segment_image():
 
     im1 = cv2.cvtColor(img,cv2.COLOR_HSV2RGB)
     cv2.imwrite("segmented.jpg", im1)
+
+    seg_label = Label(root,text="Segmented Image")
+    seg_label.grid(row=0,column=0)
 
     segmented_image_display = Image.fromarray(im1)
     segmented_image_1 = ImageTk.PhotoImage(image=segmented_image_display)
