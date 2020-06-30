@@ -21,7 +21,8 @@ Image landmark registration is a simple process where a number of points (landma
 ### Image Fusion
 
 **Architecture:**
-<img src='architecture/Image Fusion Process.png' />
+![architecture](https://user-images.githubusercontent.com/39988748/86160386-4f7f0880-bb29-11ea-938f-0e76113d7ff4.PNG)
+
 
 #### Transfer Learning
 Transfer learning is an optimization that allows rapid progress or improved performance when modeling the second task. We aim to use the **VGG-19 CNN** architecture with its pre-trained parameters which would help us to achieve our target. Visual Geometry Group (VGG-19) is a convolutional neural network that is trained on more than a million images from the ImageNet database. The network is 19 layers deep and can classify images into 1000 object categories.
