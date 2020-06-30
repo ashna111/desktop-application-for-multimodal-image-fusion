@@ -255,78 +255,81 @@ def fuse_image():
     coeffs1 = pywt.dwt2(mri_registered_cv, 'haar')
     LL_mri, (LH_mri, HL_mri, HH_mri) = coeffs1
 
+    for i, a in enumerate([LL_mri, LH_mri, HL_mri, HH_mri]):
+        path='mri_'+str(i)+'.jpg'
+        cv2.imwrite(path,a)
+
     # Wavelet transform of image, and plot approximation and details
     coeffs2 = pywt.dwt2(ct_cv, 'haar')
     LL_ct, (LH_ct, HL_ct, HH_ct) = coeffs2
 
+    for i, a in enumerate([LL_ct, LH_ct, HL_ct, HH_ct]):
+        path='ct_'+str(i)+'.jpg'
+        cv2.imwrite(path,a)
+
     #Performing fusion
-    LL_images=[]
+    input_images=[]
+    mri = cv2.imread('mri_0.jpg')
+    mri = cv2.cvtColor(mri, cv2.COLOR_BGR2GRAY)
 
-    LL_images.append(LL_mri)
-    LL_images.append(LL_ct)
-    FU = Fusion(LL_images)
+    ct = cv2.imread('ct_0.jpg')
+    ct = cv2.cvtColor(ct, cv2.COLOR_BGR2GRAY)
+    input_images.append(mri)
+    input_images.append(ct)
+    FU = Fusion(input_images)
     fusion_1 = FU.fuse()
+    cv2.imwrite('fusion_1.jpg', fusion_1)
 
-    fusion_1_display = Image.fromarray(fusion_1)
-    fusion_1_1 = ImageTk.PhotoImage(image=fusion_1_display)
-    fusion_1_display_label = Label(image=fusion_1_1)
-    fusion_1_display_label.grid(row=0,column=0)
+    input_images=[]
+    mri = cv2.imread('mri_1.jpg')
+    mri = cv2.cvtColor(mri, cv2.COLOR_BGR2GRAY)
 
-    fusion_1_display_label.image = fusion_1_1
-
-    LH_images=[]
-
-    LH_images.append(LH_mri)
-    LH_images.append(LH_ct)
-    FU = Fusion(LH_images)
+    ct = cv2.imread('ct_1.jpg')
+    ct = cv2.cvtColor(ct, cv2.COLOR_BGR2GRAY)
+    input_images.append(mri)
+    input_images.append(ct)
+    FU = Fusion(input_images)
     fusion_2 = FU.fuse()
+    cv2.imwrite('fusion_2.jpg', fusion_2)
 
-    fusion_2_display = Image.fromarray(fusion_2)
-    fusion_2_1 = ImageTk.PhotoImage(image=fusion_2_display)
-    fusion_2_display_label = Label(image=fusion_2_1)
-    fusion_2_display_label.grid(row=0,column=1)
+    input_images=[]
+    mri = cv2.imread('mri_2.jpg')
+    mri = cv2.cvtColor(mri, cv2.COLOR_BGR2GRAY)
 
-    fusion_2_display_label.image = fusion_2_1
-
-    HL_images=[]
-
-    HL_images.append(HL_mri)
-    HL_images.append(HL_ct)
-    FU = Fusion(HL_images)
+    ct = cv2.imread('ct_2.jpg')
+    ct = cv2.cvtColor(ct, cv2.COLOR_BGR2GRAY)
+    input_images.append(mri)
+    input_images.append(ct)
+    FU = Fusion(input_images)
     fusion_3 = FU.fuse()
+    cv2.imwrite('fusion_3.jpg', fusion_3)
 
-    fusion_3_display = Image.fromarray(fusion_3)
-    fusion_3_1 = ImageTk.PhotoImage(image=fusion_3_display)
-    fusion_3_display_label = Label(image=fusion_3_1)
-    fusion_3_display_label.grid(row=0,column=2)
+    input_images=[]
+    mri = cv2.imread('mri_3.jpg')
+    mri = cv2.cvtColor(mri, cv2.COLOR_BGR2GRAY)
 
-    fusion_3_display_label.image = fusion_3_1
-
-    HH_images=[]
-
-    HH_images.append(HH_mri)
-    HH_images.append(HH_ct)
-    FU = Fusion(HH_images)
+    ct = cv2.imread('ct_3.jpg')
+    ct = cv2.cvtColor(ct, cv2.COLOR_BGR2GRAY)
+    input_images.append(mri)
+    input_images.append(ct)
+    FU = Fusion(input_images)
     fusion_4 = FU.fuse()
+    cv2.imwrite('fusion_4.jpg', fusion_4)
 
-    fusion_4_display = Image.fromarray(fusion_4)
-    fusion_4_1 = ImageTk.PhotoImage(image=fusion_4_display)
-    fusion_4_display_label = Label(image=fusion_4_1)
-    fusion_4_display_label.grid(row=0,column=3)
+    coeffs=(fusion_1,(fusion_2,fusion_3,fusion_4))
+    fusion=pywt.idwt2(coeffs,'haar')
 
-    fusion_4_display_label.image = fusion_4_1
+    cv2.imwrite('fusion.jpg',fusion)
 
-    # coeffs=(fusion_1,(fusion_2,fusion_3,fusion_4))
-    # fusion=pywt.idwt2(coeffs,'haar')
+    fused_image_label=Label(root,text="Fused Image")
+    fused_image_label.grid(row=0,column=0)
 
-    # cv2.imwrite('fusion.jpg',fusion)
+    fusion_img_display = Image.fromarray(fusion)
+    fusion_img_1 = ImageTk.PhotoImage(image=fusion_img_display)
+    fusion_img_display_label = Label(image=fusion_img_1)
+    fusion_img_display_label.grid(row=1,column=0)
 
-    # fusion_img_display = Image.fromarray(fusion)
-    # fusion_img_1 = ImageTk.PhotoImage(image=fusion_img_display)
-    # fusion_img_display_label = Label(image=fusion_img_1)
-    # fusion_img_display_label.grid(row=1,column=0)
-
-    # fusion_img_display_label.image = fusion_img_1
+    fusion_img_display_label.image = fusion_img_1
 
 
 # Registration
