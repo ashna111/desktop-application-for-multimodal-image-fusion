@@ -21,6 +21,7 @@ Image landmark registration is a simple process where a number of points (landma
 ### Image Fusion
 
 **Architecture:**
+
 ![architecture](https://user-images.githubusercontent.com/39988748/86160386-4f7f0880-bb29-11ea-938f-0e76113d7ff4.PNG)
 
 
