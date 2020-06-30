@@ -20,7 +20,7 @@ import pywt.data
 from skimage.morphology import extrema
 from skimage.morphology import watershed as skwater
 
-global my_label_1,my_label_2,ct_x_label,ct_y_label,mri_x_label,mri_y_label,ct
+global my_label_1,my_label_2,ct_x_label,ct_y_label,mri_x_label,mri_y_label,ct, mri_registered, mri_registered_cv, mri_registered_label, mri_registered_image_label, ct_registered_label, ct_registered_image_label, fusion_button
 
 # Root window
 root=Tk()
@@ -250,8 +250,83 @@ def fuse_image():
     fusion_button.destroy()
     mri_registered_label.destroy()
     ct_registered_label.destroy()
-    # fusion_button.destroy()
 
+    # Wavelet transform of image, and plot approximation and details
+    coeffs1 = pywt.dwt2(mri_registered_cv, 'haar')
+    LL_mri, (LH_mri, HL_mri, HH_mri) = coeffs1
+
+    # Wavelet transform of image, and plot approximation and details
+    coeffs2 = pywt.dwt2(ct_cv, 'haar')
+    LL_ct, (LH_ct, HL_ct, HH_ct) = coeffs2
+
+    #Performing fusion
+    LL_images=[]
+
+    LL_images.append(LL_mri)
+    LL_images.append(LL_ct)
+    FU = Fusion(LL_images)
+    fusion_1 = FU.fuse()
+
+    fusion_1_display = Image.fromarray(fusion_1)
+    fusion_1_1 = ImageTk.PhotoImage(image=fusion_1_display)
+    fusion_1_display_label = Label(image=fusion_1_1)
+    fusion_1_display_label.grid(row=0,column=0)
+
+    fusion_1_display_label.image = fusion_1_1
+
+    LH_images=[]
+
+    LH_images.append(LH_mri)
+    LH_images.append(LH_ct)
+    FU = Fusion(LH_images)
+    fusion_2 = FU.fuse()
+
+    fusion_2_display = Image.fromarray(fusion_2)
+    fusion_2_1 = ImageTk.PhotoImage(image=fusion_2_display)
+    fusion_2_display_label = Label(image=fusion_2_1)
+    fusion_2_display_label.grid(row=0,column=1)
+
+    fusion_2_display_label.image = fusion_2_1
+
+    HL_images=[]
+
+    HL_images.append(HL_mri)
+    HL_images.append(HL_ct)
+    FU = Fusion(HL_images)
+    fusion_3 = FU.fuse()
+
+    fusion_3_display = Image.fromarray(fusion_3)
+    fusion_3_1 = ImageTk.PhotoImage(image=fusion_3_display)
+    fusion_3_display_label = Label(image=fusion_3_1)
+    fusion_3_display_label.grid(row=0,column=2)
+
+    fusion_3_display_label.image = fusion_3_1
+
+    HH_images=[]
+
+    HH_images.append(HH_mri)
+    HH_images.append(HH_ct)
+    FU = Fusion(HH_images)
+    fusion_4 = FU.fuse()
+
+    fusion_4_display = Image.fromarray(fusion_4)
+    fusion_4_1 = ImageTk.PhotoImage(image=fusion_4_display)
+    fusion_4_display_label = Label(image=fusion_4_1)
+    fusion_4_display_label.grid(row=0,column=3)
+
+    fusion_4_display_label.image = fusion_4_1
+
+    # coeffs=(fusion_1,(fusion_2,fusion_3,fusion_4))
+    # fusion=pywt.idwt2(coeffs,'haar')
+
+    # cv2.imwrite('fusion.jpg',fusion)
+
+    # fusion_img_display = Image.fromarray(fusion)
+    # fusion_img_1 = ImageTk.PhotoImage(image=fusion_img_display)
+    # fusion_img_display_label = Label(image=fusion_img_1)
+    # fusion_img_display_label.grid(row=1,column=0)
+
+    # fusion_img_display_label.image = fusion_img_1
 
 
 # Registration
